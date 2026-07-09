@@ -59,3 +59,36 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ report }, { status: 201 });
 }
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const line = searchParams.get("line");
+  const machine = searchParams.get("machine");
+  const q = searchParams.get("q");
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
+  const pageSize = 20;
+
+  const where = {
+    ...(line ? { line: line as never } : {}),
+    ...(machine ? { machine: { contains: machine, mode: "insensitive" as const } } : {}),
+    ...(q ? { problem: { contains: q, mode: "insensitive" as const } } : {}),
+  };
+
+  const [reports, total] = await Promise.all([
+    prisma.report.findMany({
+      where,
+      orderBy: { date: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.report.count({ where }),
+  ]);
+
+  return NextResponse.json({
+    reports,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  });
+}
