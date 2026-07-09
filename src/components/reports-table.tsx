@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
@@ -180,14 +181,33 @@ export function ReportsTable() {
                     </Tooltip>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={`/${report.filePath}`} target="_blank" rel="noreferrer">
-                        Lihat
-                      </a>
-                    </Button>
-                    <Button size="sm" onClick={() => handleDownload(report.id)}>
-                      Download
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" asChild>
+                          <a
+                            href={`/${report.filePath}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Lihat laporan"
+                          >
+                            <Eye className="size-4" />
+                          </a>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Lihat</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          aria-label="Download laporan"
+                          onClick={() => handleDownload(report.id)}
+                        >
+                          <Download className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Download</TooltipContent>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
