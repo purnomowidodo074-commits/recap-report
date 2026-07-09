@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { MAX_FILE_SIZE_BYTES, reportFormSchema } from "@/lib/validations/report";
+import { LINE_VALUES, MAX_FILE_SIZE_BYTES, reportFormSchema } from "@/lib/validations/report";
 import { saveUploadedPdf } from "@/lib/storage";
 
 export async function POST(request: NextRequest) {
@@ -45,17 +45,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const report = await prisma.report.create({
-    data: {
-      date: parsed.data.date,
-      line: parsed.data.line,
-      machine: parsed.data.machine,
-      problem: parsed.data.problem,
-      fileName: saved.fileName,
-      filePath: saved.filePath,
-      fileSize: saved.fileSize,
-    },
-  });
+  let report;
+  try {
+    report = await prisma.report.create({
+      data: {
+        date: parsed.data.date,
+        line: parsed.data.line,
+        machine: parsed.data.machine,
+        problem: parsed.data.problem,
+        fileName: saved.fileName,
+        filePath: saved.filePath,
+        fileSize: saved.fileSize,
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: "Gagal menyimpan laporan" }, { status: 500 });
+  }
 
   return NextResponse.json({ report }, { status: 201 });
 }
@@ -68,21 +73,29 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
   const pageSize = 20;
 
+  const isValidLine = (value: string | null): value is (typeof LINE_VALUES)[number] =>
+    value !== null && (LINE_VALUES as readonly string[]).includes(value);
+
   const where = {
-    ...(line ? { line: line as never } : {}),
+    ...(isValidLine(line) ? { line } : {}),
     ...(machine ? { machine: { contains: machine, mode: "insensitive" as const } } : {}),
     ...(q ? { problem: { contains: q, mode: "insensitive" as const } } : {}),
   };
 
-  const [reports, total] = await Promise.all([
-    prisma.report.findMany({
-      where,
-      orderBy: { date: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    prisma.report.count({ where }),
-  ]);
+  let reports, total;
+  try {
+    [reports, total] = await Promise.all([
+      prisma.report.findMany({
+        where,
+        orderBy: { date: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.report.count({ where }),
+    ]);
+  } catch {
+    return NextResponse.json({ error: "Gagal memuat data laporan" }, { status: 500 });
+  }
 
   return NextResponse.json({
     reports,

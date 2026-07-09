@@ -157,7 +157,7 @@ export function ReportsTable() {
                 </TableCell>
               </TableRow>
             )}
-            {!loading && data?.reports.length === 0 && (
+            {!loading && data?.reports?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-muted-foreground">
                   Belum ada laporan
@@ -165,7 +165,7 @@ export function ReportsTable() {
               </TableRow>
             )}
             {!loading &&
-              data?.reports.map((report) => (
+              data?.reports?.map((report) => (
                 <TableRow key={report.id}>
                   <TableCell>{formatDate(report.date)}</TableCell>
                   <TableCell>{lineLabel(report.line)}</TableCell>
