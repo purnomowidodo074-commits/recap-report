@@ -221,7 +221,7 @@ export function ReportsTable() {
                       <TooltipTrigger asChild>
                         <Button variant="outline" size="icon" asChild>
                           <a
-                            href={`/${report.filePath}`}
+                            href={report.filePath}
                             target="_blank"
                             rel="noreferrer"
                             aria-label="Lihat laporan"

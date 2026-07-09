@@ -1,8 +1,5 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-
-export const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+import { del, put } from "@vercel/blob";
 
 const PDF_MAGIC_BYTES = Buffer.from("%PDF-");
 
@@ -22,15 +19,19 @@ export async function saveUploadedPdf(file: File): Promise<{
     throw new Error("File yang diunggah bukan PDF yang valid");
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
-
   const storedName = `${randomUUID()}.pdf`;
-  const destination = path.join(UPLOAD_DIR, storedName);
-  await writeFile(destination, buffer);
+  const blob = await put(`uploads/${storedName}`, buffer, {
+    access: "public",
+    contentType: "application/pdf",
+  });
 
   return {
     fileName: file.name,
-    filePath: `uploads/${storedName}`,
+    filePath: blob.url,
     fileSize: buffer.byteLength,
   };
+}
+
+export async function deleteUploadedPdf(filePath: string): Promise<void> {
+  await del(filePath);
 }

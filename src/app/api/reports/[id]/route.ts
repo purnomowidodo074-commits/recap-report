@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deleteUploadedPdf } from "@/lib/storage";
 
 export async function DELETE(
   _request: NextRequest,
@@ -16,6 +17,12 @@ export async function DELETE(
     await prisma.report.delete({ where: { id } });
   } catch {
     return NextResponse.json({ error: "Gagal menghapus laporan" }, { status: 500 });
+  }
+
+  try {
+    await deleteUploadedPdf(existing.filePath);
+  } catch {
+    // Report record is already deleted; a leftover blob is not user-facing.
   }
 
   return NextResponse.json({ success: true });

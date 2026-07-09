@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { buildMergedReportPdf } from "@/lib/pdf/merge";
 import { lineLabel } from "@/lib/validations/report";
@@ -15,11 +13,13 @@ export async function GET(
     return NextResponse.json({ error: "Laporan tidak ditemukan" }, { status: 404 });
   }
 
-  const absolutePath = path.join(process.cwd(), "public", report.filePath);
-
   let originalBytes: Buffer;
   try {
-    originalBytes = await readFile(absolutePath);
+    const blobResponse = await fetch(report.filePath);
+    if (!blobResponse.ok) {
+      throw new Error("Blob fetch failed");
+    }
+    originalBytes = Buffer.from(await blobResponse.arrayBuffer());
   } catch {
     return NextResponse.json(
       { error: "File PDF asli tidak ditemukan di server" },
