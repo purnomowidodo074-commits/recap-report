@@ -139,14 +139,15 @@ export function ReportsTable() {
           </Select>
         </div>
 
+        <div className="max-h-[480px] overflow-y-auto rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Line</TableHead>
-              <TableHead>Nama Mesin</TableHead>
-              <TableHead>Problem</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
+          <TableHeader className="sticky top-0 z-10 bg-blue-600">
+            <TableRow className="border-b-0 hover:bg-blue-600">
+              <TableHead className="text-white">Tanggal</TableHead>
+              <TableHead className="text-white">Line</TableHead>
+              <TableHead className="text-white">Nama Mesin</TableHead>
+              <TableHead className="text-white">Problem</TableHead>
+              <TableHead className="text-right text-white">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,6 +193,7 @@ export function ReportsTable() {
               ))}
           </TableBody>
         </Table>
+        </div>
 
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-end gap-2">
