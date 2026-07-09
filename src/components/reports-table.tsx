@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, Eye } from "lucide-react";
+import { Download, Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -66,6 +77,7 @@ export function ReportsTable() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<ReportsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const debouncedMachine = useDebouncedValue(machine, 300);
   const debouncedQuery = useDebouncedValue(query, 300);
@@ -107,6 +119,30 @@ export function ReportsTable() {
     anchor.download = match?.[1] ?? "laporan.pdf";
     anchor.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/reports/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: "Gagal menghapus laporan" }));
+        toast.error(body.error ?? "Gagal menghapus laporan");
+        return;
+      }
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              reports: current.reports.filter((report) => report.id !== id),
+              total: current.total - 1,
+            }
+          : current,
+      );
+      toast.success("Laporan berhasil dihapus");
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   return (
@@ -208,6 +244,40 @@ export function ReportsTable() {
                       </TooltipTrigger>
                       <TooltipContent>Download</TooltipContent>
                     </Tooltip>
+                    <AlertDialog>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              aria-label="Hapus laporan"
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>Hapus</TooltipContent>
+                      </Tooltip>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Hapus laporan ini?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tindakan ini tidak dapat dibatalkan. Laporan akan dihapus
+                            permanen dari sistem.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            disabled={deletingId === report.id}
+                            onClick={() => handleDelete(report.id)}
+                          >
+                            Hapus
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))}
