@@ -144,7 +144,7 @@ git commit -m "chore: install dependencies and init Shadcn UI"
 - Create: `.env.example`
 
 **Interfaces:**
-- Produces: `Report` model and `Line` enum available via `@prisma/client` after `prisma generate`; a `reports` table created in the Neon database after `prisma migrate dev`.
+- Produces: `Report` model and `Line` enum available via the generated client at `src/generated/prisma/client` (NOT `@prisma/client` — the custom `output` path means `@prisma/client`'s default export is unresolvable in this project) after `prisma generate`; a `reports` table created in the Neon database after `prisma migrate dev`. `PrismaClient` must be constructed with a `PrismaPg` adapter (`@prisma/adapter-pg`) since Prisma 7's `prisma-client` generator has no bundled query engine.
 
 - [ ] **Step 1: Initialize Prisma with the postgresql provider**
 
@@ -202,7 +202,7 @@ enum Line {
 npx prisma migrate dev --name init
 ```
 
-Expected: migration applies successfully, `reports` table exists in Neon, `@prisma/client` types are generated.
+Expected: migration applies successfully, `reports` table exists in Neon, types are generated to `src/generated/prisma` (the client is imported from that generated path, not `@prisma/client`, due to the custom `output` setting).
 
 - [ ] **Step 5: Verify the connection with Prisma Studio**
 
@@ -238,7 +238,7 @@ git commit -m "feat: add Prisma schema and Neon connection"
 - Create: `src/lib/storage.ts`
 
 **Interfaces:**
-- Consumes: `@prisma/client` types from Task 3 (`Line` enum values must match the schema exactly: `MEL_POUR_ANALYS`, `MOULD_RCS`, `CORE_MAKING`, `FINISHING`, `MAINTENANCE`, `DIE_PRESS`).
+- Consumes: `PrismaClient` and `Line` enum types generated to `src/generated/prisma` from Task 3 — import from `../generated/prisma/client` (NOT `@prisma/client`; the schema's custom `output` path means `@prisma/client`'s default export doesn't resolve in this project), constructed with a `PrismaPg` adapter (`@prisma/adapter-pg`) since Prisma 7's `prisma-client` generator ships no bundled query engine. `Line` enum values must match the schema exactly: `MEL_POUR_ANALYS`, `MOULD_RCS`, `CORE_MAKING`, `FINISHING`, `MAINTENANCE`, `DIE_PRESS`.
 - Produces:
   - `LINE_VALUES: readonly string[]`, `LINE_OPTIONS: { value: string; label: string }[]`, `lineLabel(value: string): string`, `MAX_FILE_SIZE_BYTES: number`, `reportFormSchema: ZodSchema`, `type ReportFormValues` — all from `@/lib/validations/report`.
   - `prisma: PrismaClient` singleton from `@/lib/prisma`.
@@ -303,13 +303,16 @@ export type ReportFormValues = z.infer<typeof reportFormSchema>;
 `src/lib/prisma.ts`:
 
 ```typescript
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
