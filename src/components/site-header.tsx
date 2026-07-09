@@ -1,10 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function SiteHeader() {
   return (
     <header className="border-b bg-white">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-4">
-        <span className="text-lg font-semibold">Rekap Laporan 5W</span>
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4">
+        <div className="flex items-center gap-2">
+          <Image src="/logo.png" alt="Logo" width={32} height={32} />
+          <span className="text-lg font-semibold">
+            Sistem Manajemen &amp; Rekap Laporan PDF
+          </span>
+        </div>
         <nav className="flex items-center justify-center gap-3 text-sm">
           <Link
             href="/"
