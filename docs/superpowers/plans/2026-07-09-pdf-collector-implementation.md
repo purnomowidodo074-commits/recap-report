@@ -51,7 +51,9 @@ src/components/ui/*               # Shadcn-generated primitives
 ### Task 1: Scaffold the Next.js project
 
 **Files:**
-- Create: entire Next.js scaffold (`package.json`, `tsconfig.json`, `next.config.ts`, `tailwind.config.ts`, `postcss.config.mjs`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `eslint.config.mjs`)
+- Create: entire Next.js scaffold (`package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`, `eslint.config.mjs`)
+
+Note: `create-next-app` currently scaffolds Tailwind v4, which has no `tailwind.config.ts` — Tailwind is configured via `@import "tailwindcss"` and `@theme` in `globals.css` instead. Do not add a `tailwind.config.ts`.
 
 **Interfaces:**
 - Produces: a runnable Next.js dev server on `http://localhost:3000`, `src/` directory with `@/*` import alias, Tailwind configured.
