@@ -27,15 +27,23 @@ export async function GET(
     );
   }
 
-  const mergedBytes = await buildMergedReportPdf(
-    {
-      date: report.date,
-      line: report.line,
-      machine: report.machine,
-      problem: report.problem,
-    },
-    originalBytes,
-  );
+  let mergedBytes: Buffer;
+  try {
+    mergedBytes = await buildMergedReportPdf(
+      {
+        date: report.date,
+        line: report.line,
+        machine: report.machine,
+        problem: report.problem,
+      },
+      originalBytes,
+    );
+  } catch {
+    return NextResponse.json(
+      { error: "Gagal membuat PDF gabungan" },
+      { status: 500 },
+    );
+  }
 
   const dateSlug = report.date.toISOString().slice(0, 10);
   const fileName = `Laporan-${lineLabel(report.line)}-${dateSlug}.pdf`.replace(/\s+/g, "-");
