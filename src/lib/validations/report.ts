@@ -30,15 +30,15 @@ export function lineLabel(value: string): string {
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 export const reportFormSchema = z.object({
-  date: z.coerce.date(),
-  line: z.enum([...LINE_VALUES]),
+  date: z.coerce.date({ error: "Tanggal wajib diisi" }),
+  line: z.enum([...LINE_VALUES], { error: "Line wajib dipilih" }),
   machine: z
-    .string()
+    .string({ error: "Nama mesin wajib diisi" })
     .trim()
     .min(1, "Nama mesin wajib diisi")
     .max(100, "Nama mesin maksimal 100 karakter"),
   problem: z
-    .string()
+    .string({ error: "Problem wajib diisi" })
     .trim()
     .min(1, "Problem wajib diisi")
     .max(2000, "Problem maksimal 2000 karakter"),
