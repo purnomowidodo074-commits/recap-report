@@ -237,6 +237,7 @@ export function ReportsTable() {
                         <Button
                           size="icon"
                           aria-label="Download laporan"
+                          className="bg-green-600 hover:bg-green-700"
                           onClick={() => handleDownload(report.id)}
                         >
                           <Download className="size-4" />

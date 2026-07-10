@@ -223,7 +223,11 @@ export function ReportForm() {
               )}
             </div>
 
-            <Button type="submit" disabled={submitting} className="w-full">
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
               {submitting ? "Menyimpan..." : "Simpan Laporan"}
             </Button>
           </form>

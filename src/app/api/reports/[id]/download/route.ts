@@ -54,6 +54,7 @@ export async function GET(
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${fileName}"`,
+      "Cache-Control": "private, max-age=3600",
     },
   });
 }
