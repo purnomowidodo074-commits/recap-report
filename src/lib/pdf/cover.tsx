@@ -1,11 +1,39 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import path from "path";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { lineLabel } from "@/lib/validations/report";
+
+const logoPath = path.join(process.cwd(), "public", "logo.png");
 
 const styles = StyleSheet.create({
   page: {
     padding: 48,
     fontSize: 11,
     fontFamily: "Helvetica",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingBottom: 12,
+  },
+  logo: {
+    width: 56,
+    height: 34,
+    objectFit: "contain",
+  },
+  headerTitle: {
+    fontSize: 13,
+    fontWeight: 700,
+    lineHeight: 1.3,
+  },
+  stripeRed600: {
+    height: 3,
+    backgroundColor: "#DC2626",
+  },
+  stripeRed800: {
+    height: 3,
+    backgroundColor: "#991B1B",
+    marginBottom: 24,
   },
   title: {
     fontSize: 18,
@@ -14,27 +42,32 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 10,
     color: "#6B7280",
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  row: {
+  table: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
-    paddingVertical: 8,
   },
-  label: {
+  tableRowLast: {
+    flexDirection: "row",
+  },
+  cellLabel: {
     width: 140,
-    color: "#6B7280",
+    padding: 8,
+    backgroundColor: "#F9FAFB",
+    borderRightWidth: 1,
+    borderRightColor: "#E5E7EB",
+    color: "#374151",
+    fontWeight: 700,
   },
-  value: {
+  cellValue: {
     flex: 1,
-  },
-  problemBlock: {
-    marginTop: 16,
-  },
-  problemLabel: {
-    color: "#6B7280",
-    marginBottom: 4,
+    padding: 8,
   },
 });
 
@@ -57,25 +90,35 @@ export function ReportCoverDocument({ date, line, machine, problem }: ReportCove
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <View style={styles.headerRow}>
+          <Image src={logoPath} style={styles.logo} />
+          <Text style={styles.headerTitle}>
+            Sistem Manajemen &amp;{"\n"}Rekap Laporan PDF
+          </Text>
+        </View>
+        <View style={styles.stripeRed600} />
+        <View style={styles.stripeRed800} />
+
         <Text style={styles.title}>Laporan Masalah 5W</Text>
         <Text style={styles.subtitle}>Dokumen ini dibuat otomatis sebagai cover laporan</Text>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Tanggal</Text>
-          <Text style={styles.value}>{formatDate(date)}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Line</Text>
-          <Text style={styles.value}>{lineLabel(line)}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Nama Mesin</Text>
-          <Text style={styles.value}>{machine}</Text>
-        </View>
-
-        <View style={styles.problemBlock}>
-          <Text style={styles.problemLabel}>Problem</Text>
-          <Text style={styles.value}>{problem}</Text>
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <Text style={styles.cellLabel}>Tanggal</Text>
+            <Text style={styles.cellValue}>{formatDate(date)}</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.cellLabel}>Line</Text>
+            <Text style={styles.cellValue}>{lineLabel(line)}</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.cellLabel}>Nama Mesin</Text>
+            <Text style={styles.cellValue}>{machine}</Text>
+          </View>
+          <View style={styles.tableRowLast}>
+            <Text style={styles.cellLabel}>Problem</Text>
+            <Text style={styles.cellValue}>{problem}</Text>
+          </View>
         </View>
       </Page>
     </Document>
