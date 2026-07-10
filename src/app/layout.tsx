@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body className={`${inter.className} bg-white text-gray-900`}>
         <SiteHeader />
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-5xl px-4 pt-24 pb-24">{children}</main>
         <SiteFooter />
         <Toaster />
       </body>
