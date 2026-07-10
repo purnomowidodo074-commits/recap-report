@@ -39,11 +39,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 10,
-    color: "#6B7280",
-    marginBottom: 20,
-  },
   table: {
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -99,8 +94,7 @@ export function ReportCoverDocument({ date, line, machine, problem }: ReportCove
         <View style={styles.stripeRed600} />
         <View style={styles.stripeRed800} />
 
-        <Text style={styles.title}>Laporan Masalah 5W</Text>
-        <Text style={styles.subtitle}>Dokumen ini dibuat otomatis sebagai cover laporan</Text>
+        <Text style={[styles.title, { marginBottom: 20 }]}>Laporan Masalah 5W</Text>
 
         <View style={styles.table}>
           <View style={styles.tableRow}>

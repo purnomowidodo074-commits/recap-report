@@ -4,9 +4,10 @@ import { buildMergedReportPdf } from "@/lib/pdf/merge";
 import { lineLabel } from "@/lib/validations/report";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const inline = request.nextUrl.searchParams.get("inline") === "1";
   const report = await prisma.report.findUnique({ where: { id: (await params).id } });
 
   if (!report) {
@@ -52,7 +53,7 @@ export async function GET(
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${fileName}"`,
+      "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${fileName}"`,
     },
   });
 }
