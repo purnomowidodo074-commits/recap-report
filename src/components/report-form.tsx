@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, FileText, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,8 @@ export function ReportForm() {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ReportFormValues>({
     // Cast needed: reportFormSchema uses z.coerce.date(), so under Zod v4 +
@@ -59,8 +61,7 @@ export function ReportForm() {
     defaultValues: emptyValues,
   });
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const selected = event.target.files?.[0] ?? null;
+  function validateAndSetFile(selected: File | null) {
     setFileError(null);
 
     if (!selected) {
@@ -83,6 +84,24 @@ export function ReportForm() {
     }
 
     setFile(selected);
+  }
+
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    validateAndSetFile(event.target.files?.[0] ?? null);
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDragging(false);
+    validateAndSetFile(event.dataTransfer.files?.[0] ?? null);
+  }
+
+  function handleRemoveFile() {
+    setFile(null);
+    setFileError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   }
 
   async function onSubmit(values: ReportFormValues) {
@@ -215,17 +234,79 @@ export function ReportForm() {
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">Upload File 5W (PDF)</label>
-              <Input type="file" accept="application/pdf" onChange={handleFileChange} />
-              {fileError && <p className="text-sm font-medium text-destructive">{fileError}</p>}
-              {file && !fileError && (
-                <p className="text-sm text-muted-foreground">{file.name}</p>
+              <label className="text-sm font-medium leading-none">
+                Upload File 5W (PDF) <span className="text-destructive">*</span>
+              </label>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="sr-only"
+              />
+
+              {file ? (
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-input bg-muted/40 px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="h-6 w-6 shrink-0 text-green-600" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{file.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={handleRemoveFile}
+                    aria-label="Hapus file"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  className={cn(
+                    "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors",
+                    isDragging
+                      ? "border-green-600 bg-green-600/5"
+                      : "border-input hover:border-green-600/50 hover:bg-muted/40",
+                    fileError && "border-destructive",
+                  )}
+                >
+                  <UploadCloud className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">
+                    Click to upload or drag files here
+                  </p>
+                  <p className="text-xs text-muted-foreground">PDF, maksimal 10MB</p>
+                </div>
               )}
+
+              {fileError && <p className="text-sm font-medium text-destructive">{fileError}</p>}
             </div>
 
             <Button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !file}
               className="w-full bg-green-600 hover:bg-green-700"
             >
               {submitting ? "Menyimpan..." : "Simpan Laporan"}

@@ -1,7 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { cn } from "@/lib/utils";
+
+const NAV_ITEMS = [
+  { href: "/", label: "Form Laporan" },
+  { href: "/rekap", label: "Rekap Data" },
+];
 
 export function SiteHeader() {
+  const pathname = usePathname();
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-16 bg-neutral-50">
       <div className="mx-auto flex h-full max-w-5xl items-center justify-between gap-4 px-4">
@@ -20,18 +32,22 @@ export function SiteHeader() {
           </span>
         </div>
         <nav className="flex items-center gap-2 text-sm">
-          <Link
-            href="/"
-            className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white transition-colors hover:bg-red-700"
-          >
-            Form Laporan
-          </Link>
-          <Link
-            href="/rekap"
-            className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white transition-colors hover:bg-red-700"
-          >
-            Rekap Data
-          </Link>
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "rounded-md bg-red-600 px-3 py-1.5 font-medium text-white transition-colors hover:bg-red-700",
+                  isActive && "underline underline-offset-4",
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </div>
       <div className="absolute inset-x-0 bottom-0 flex flex-col">

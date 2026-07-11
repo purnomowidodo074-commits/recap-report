@@ -176,7 +176,7 @@ export function ReportsTable() {
           </Select>
         </div>
 
-        <div className="max-h-[480px] overflow-y-auto rounded-md border">
+        <div className="max-h-[480px] overflow-auto rounded-md border [&>div]:overflow-visible">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-blue-600">
             <TableRow className="border-b-0 hover:bg-blue-600">
@@ -203,8 +203,11 @@ export function ReportsTable() {
               </TableRow>
             )}
             {!loading &&
-              data?.reports?.map((report) => (
-                <TableRow key={report.id}>
+              data?.reports?.map((report, index) => (
+                <TableRow
+                  key={report.id}
+                  className={index % 2 === 1 ? "bg-green-500/5" : undefined}
+                >
                   <TableCell>{formatDate(report.date)}</TableCell>
                   <TableCell>{lineLabel(report.line)}</TableCell>
                   <TableCell>{report.machine}</TableCell>
