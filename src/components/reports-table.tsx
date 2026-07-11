@@ -176,7 +176,7 @@ export function ReportsTable() {
           </Select>
         </div>
 
-        <div className="max-h-[480px] overflow-auto rounded-md border [&>div]:overflow-visible">
+        <div className="max-h-[600px] overflow-auto rounded-md border [&>div]:overflow-visible">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-blue-600">
             <TableRow className="border-b-0 hover:bg-blue-600">
