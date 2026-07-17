@@ -88,7 +88,7 @@ export function ReportCoverDocument({ date, line, machine, problem }: ReportCove
         <View style={styles.headerRow}>
           <Image src={logoPath} style={styles.logo} />
           <Text style={styles.headerTitle}>
-            Sistem Management 5 Way Report
+            Sistem Management{"\n"}5 Way Report
           </Text>
         </View>
         <View style={styles.stripeRed600} />
