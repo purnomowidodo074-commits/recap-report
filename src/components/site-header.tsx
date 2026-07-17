@@ -26,9 +26,9 @@ export function SiteHeader() {
             className="h-10 w-16 object-contain"
           />
           <span className="text-sm leading-tight font-semibold">
-            Sistem Manajemen &amp;
+            Sistem Management
             <br />
-            Rekap Laporan PDF
+            5 Way Report
           </span>
         </div>
         <nav className="flex items-center gap-2 text-sm">
@@ -40,8 +40,10 @@ export function SiteHeader() {
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "rounded-md bg-red-600 px-3 py-1.5 font-medium text-white transition-colors hover:bg-red-700",
-                  isActive && "underline underline-offset-4",
+                  "rounded-md px-3 py-1.5 font-medium transition-colors",
+                  isActive
+                    ? "bg-red-600 text-white"
+                    : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300",
                 )}
               >
                 {item.label}
